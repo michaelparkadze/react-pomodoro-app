@@ -1,11 +1,14 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useInterval } from "./hooks/useInterval";
+import TaskList from "./containers/TaskList";
+import Timer from "./containers/Timer";
 
 function App() {
   const [time, setTime] = useState(1500000);
+  const [selectedTime, setSelectedTime] = useState(1500000);
   const [started, setStarted] = useState(false);
 
-  useInterval(() => setTime(time - 1000), started ? 1000 : null);
+  useInterval(() => setTime(time - 1000), started && time > 0 ? 1000 : null);
 
   const handleButtonClick = () => {
     setStarted(!started);
@@ -14,42 +17,37 @@ function App() {
   const handleResetTimer = () => {
     setStarted(false);
     setTime(1500000);
-  };
-
-  const Timer = () => {
-    let minutes = Math.floor(time / 60000);
-    let seconds = ((time % 60000) / 1000).toFixed(0);
-    return (
-      <>
-        {minutes < 10 ? <span>0{minutes}</span> : <span>{minutes}</span>}:
-        {seconds < 10 ? <span>0{seconds}</span> : <span>{seconds}</span>}
-      </>
-    );
+    setSelectedTime(1500000);
   };
 
   const handleIncrement = () => {
-    setTime(time + 60000);
+    setTime(selectedTime + 60000);
+    setSelectedTime(selectedTime + 60000);
   };
 
   const handleDecrement = () => {
-    setTime(time - 60000);
+    if (time > 60000) {
+      setSelectedTime(selectedTime - 60000);
+      setTime(selectedTime - 60000);
+    }
   };
 
   return (
     <div className="pomodoro">
       <div className="pomodoro__timer">
-        <Timer />
+        {/* <Timer
+          time={time}
+          selectedTime={selectedTime}
+          started={started}
+          handleButtonClick={handleButtonClick}
+          handleIncrement={handleIncrement}
+          handleDecrement={handleDecrement}
+          handleResetTimer={handleResetTimer}
+        /> */}
       </div>
-      <input
-        type="number"
-        value={Math.floor(time / 60000)}
-        disabled
-        // onChange={(e) => setTime(e.target.value * 60000)}
-      />
-      <button onClick={handleIncrement}>+</button>
-      <button onClick={handleDecrement}>-</button>
-      <button onClick={handleButtonClick}>{started ? "Stop" : "Start"}</button>
-      <button onClick={handleResetTimer}>Reset</button>
+      <div className="pomodoro__tasks">
+        <TaskList />
+      </div>
     </div>
   );
 }
