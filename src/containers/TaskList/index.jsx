@@ -1,21 +1,30 @@
 import { useState } from "react";
 
 export default function TaskList(props) {
-  const [tasks, setTasks] = useState([
-    {
-      title: "Example task",
-      description: "task description",
-      finished: false,
-    },
-  ]);
+  // true = show create task inputs, false = no, default = false
+  const [create, setCreate] = useState(false);
+  const [tasks, setTasks] = useState([]);
+  const [newTask, setNewTask] = useState({
+    title: "",
+    description: "",
+    finished: false,
+  });
 
   const handleCreateTask = (params) => {
-    const { title, description } = params;
+    setCreate(!create);
+    // // create task object
+    // const task = { title: title, description: description, finished: false };
+    // // create new array of tasks which includes all past tasks and add the new task to it
+    // setTasks((prevState) => [...prevState, task]);
+  };
 
-    // create task object
-    const task = { title: title, description: description, finished: false };
-    // create new array of tasks which includes all past tasks and add the new task to it
-    setTasks((prevState) => [...prevState, task]);
+  const handleOnChange = (event) => {
+    const value = event.target.value;
+    const name = event.target.name;
+    setNewTask({
+      ...newTask,
+      [name]: value,
+    });
   };
 
   const handleDeleteTask = (index) => {
@@ -41,39 +50,78 @@ export default function TaskList(props) {
     };
     setTasks(tasksClone);
   };
+
+  const CreateTaskForm = () => (
+    <div className="create-task-form">
+      <input
+        type="text"
+        name="title"
+        placeholder="enter title"
+        onChange={(e) => {
+          handleOnChange(e);
+        }}
+      />
+      <input
+        type="text"
+        name="description"
+        placeholder="enter description"
+        onChange={(e) => handleOnChange(e)}
+      />
+    </div>
+  );
+
   return (
     <div className="pomodoro__tasks__list">
-      this is going to be a task list 1. ceate task 2. delete task 3. edit task
-      4. check task as finished
+      <h1>task state current:</h1>
+      {Object.entries(newTask).map((item, index) => {
+        return (
+          <div>
+            {item[0]}: {item[1]}
+          </div>
+        );
+      })}
       <h2>Tasks:</h2>
       {tasks.map((task, index) => {
         return (
           <div style={{ backgroundColor: task.finished ? "red" : "yellow" }}>
             {task.title}
             <button onClick={() => handleCheckmarkTask(index)}>
-              check me please boss
+              {task.finished ? "Uncheck" : "Check"}
             </button>
 
-            <button onClick={() => handleDeleteTask(index)}>delete me</button>
+            <button onClick={() => handleDeleteTask(index)}>X</button>
             <button
               onClick={() => {
                 handleEditTask({ newTitle: "i got changed lol", index: index });
               }}
             >
-              try me bitch
+              Edit
             </button>
           </div>
         );
       })}
-      <button
-        onClick={() =>
-          handleCreateTask({
-            title: `title -${tasks.length}`,
-            description: "desc",
-          })
-        }
-      >
-        Create Task
+      {create && (
+        <>
+          <div className="create-task-form">
+            <input
+              type="text"
+              name="title"
+              placeholder="enter title"
+              onChange={(e) => {
+                handleOnChange(e);
+              }}
+            />
+            <input
+              type="text"
+              name="description"
+              placeholder="enter description"
+              onChange={(e) => handleOnChange(e)}
+            />
+          </div>
+        </>
+      )}
+      <button onClick={() => handleCreateTask()}>
+        {create ? "Cancel" : "Create new task"}
       </button>
     </div>
   );
