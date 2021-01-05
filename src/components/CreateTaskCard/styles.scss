@@ -1,0 +1,10 @@
+.create-task-card {
+  padding: 16px;
+  > input {
+    margin-bottom: 8px;
+  }
+  > button {
+    display: block;
+    margin-left: auto;
+  }
+}
